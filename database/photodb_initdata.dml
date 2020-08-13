@@ -1,0 +1,2 @@
+# unknown camera
+INSERT INTO camera (id, model, brand) VALUES (0, 'UNKNOWN', NULL);
