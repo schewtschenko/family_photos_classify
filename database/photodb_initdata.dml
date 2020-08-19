@@ -1,2 +1,5 @@
 # unknown camera
 INSERT INTO camera (id, model, brand) VALUES (0, 'UNKNOWN', NULL);
+
+# current folder
+INSERT INTO subfolder (id, name) VALUES (0, '.');
