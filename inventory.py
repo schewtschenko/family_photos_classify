@@ -124,6 +124,14 @@ def read_image_exif(exif_data, tag_names):
                     if tag_name == 'GPSInfo':
                         read_gps_info(value, image_props)
                     else:
+                        if isinstance(value, str):
+                            # remove '\x00' at right
+                            value = value.rstrip('\x00')
+                            # remove begin and end spaces
+                            value = value.strip()
+                            # do not put empty strings
+                            if len(value) == 0:
+                                continue
                         image_props[tag_name] = value
     return image_props
 
@@ -237,7 +245,7 @@ def insert_camera_get_id(conn, model, brand):
         cursor_insert.execute(stmt_insert, (camera_id, model, brand))
     except mysql.connector.Error as err:
         print(err)
-        print(len(model), ' -> ', model)
+        print(len(model), ' -> ', list(model))
         print(brand)
         error_num = err.errno
     finally:
@@ -304,6 +312,22 @@ def insert_image_get_id(conn, file_name, subfolder_id, res_width, res_height, ca
     return (error_num, image_id)
 
 
+def fix_extra_spaces(exif_datetime):
+    '''
+    sometimes input looks like:
+    '2015: 8:21 11:31: 7'
+     0123456789012345678
+    '''
+    if exif_datetime.count(' ') > 1:
+        if len(exif_datetime) == 19:
+            chars = list(exif_datetime)
+            for i in [5, 8, 11, 14, 17]:
+                if chars[i] == ' ':
+                    chars[i] = '0'
+            return ''.join(chars)
+    return exif_datetime
+
+
 def check_and_convert_datetime(exif_datetime):
     '''
     Input   Exif: '2020:01:06 16:01:06'
@@ -311,9 +335,10 @@ def check_and_convert_datetime(exif_datetime):
     '''
     if not exif_datetime:
         return None
+    fixed_datetime = fix_extra_spaces(exif_datetime)
     mysql_datetime = None
     try:
-        dt = datetime.strptime(exif_datetime, '%Y:%m:%d %H:%M:%S')
+        dt = datetime.strptime(fixed_datetime, '%Y:%m:%d %H:%M:%S')
         mysql_datetime = dt.strftime('%Y-%m-%d %H:%M:%S')
     except ValueError as err:
         print(err)
@@ -402,7 +427,8 @@ def register_image(conn, file_name, subfolder, image_props):
         exif_height = image_props['ExifImageHeight']
         if isinstance(exif_width, int) and isinstance(exif_height, int):
             if exif_width != image_width or exif_height != image_height:
-                print('warning: mismatch of image sizes')
+                print('warning: mismatch of image sizes: {} and {} for {}/{}'.format(
+                    (image_width, image_height), (exif_width, exif_height), subfolder, file_name))
     # image datetime
     photo_datetime = check_and_convert_datetime(
         image_props.get('DateTime', None))
@@ -410,7 +436,8 @@ def register_image(conn, file_name, subfolder, image_props):
         photo_datetime = check_and_convert_datetime(
             image_props.get('DateTimeOriginal', None))
     # image
-    (error_num, has_data, image_id) = select_image_id(conn, file_name, subfolder_id)
+    (error_num, has_data, image_id) = select_image_id(
+        conn, file_name, subfolder_id)
     if error_num == 0 and not has_data:
         # add new image
         (error_num, image_id) = insert_image_get_id(conn, file_name,
@@ -418,7 +445,7 @@ def register_image(conn, file_name, subfolder, image_props):
         if error_num == 0:
             register_gps_location(conn, image_id, image_props)
             conn.commit()
-            print('info: added image {}, id={}'.format(file_name, image_id))
+            # print('info: added image {}, id={}'.format(file_name, image_id))
         else:
             conn.rollback()
 
@@ -441,8 +468,6 @@ def enumerate_image_files(root_folder, conn, **kwargs):
                 else:
                     subfolder = '.'
 
-                #print('info:', file_path)
-                #print(image_props)
                 register_image(conn, file_name, subfolder, image_props)
 
                 file_count += 1
