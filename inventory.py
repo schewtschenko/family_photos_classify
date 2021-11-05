@@ -55,7 +55,7 @@ def get_root_folder_list(config_data):
 
 
 processed_tag_names = {'ExifImageWidth', 'ExifImageHeight',
-                       'DateTime', 'DateTimeOriginal',
+                       'DateTime', 'DateTimeOriginal', 'DateTimeDigitized',
                        'Make', 'Model', 'GPSInfo'}
 
 
@@ -435,6 +435,9 @@ def register_image(conn, file_name, subfolder, image_props):
     if not photo_datetime:
         photo_datetime = check_and_convert_datetime(
             image_props.get('DateTimeOriginal', None))
+    if not photo_datetime:
+        photo_datetime = check_and_convert_datetime(
+            image_props.get('DateTimeDigitized', None))
     # image
     (error_num, has_data, image_id) = select_image_id(
         conn, file_name, subfolder_id)
