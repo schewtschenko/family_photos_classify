@@ -1,5 +1,24 @@
-# unknown camera
+-- unknown camera
 INSERT INTO camera (id, model, brand) VALUES (0, 'UNKNOWN', NULL);
 
-# current folder
+-- FIXME: current folder 
 INSERT INTO subfolder (id, name) VALUES (0, '.');
+
+-- unknown country
+INSERT INTO country (id, name) VALUES (0, 'UNKNOWN');
+
+-- unknown region
+INSERT INTO region (id, name) VALUES (0, 'UNKNOWN');
+
+-- unknown city
+INSERT INTO city (id, name) VALUES (0, 'UNKNOWN');
+
+-- unknown location
+INSERT INTO location
+  (id, place,
+  country_id, region_id, city_id,
+  latitude, longitude)
+VALUES 
+  (0, 'UNKNOWN',
+  0, 0, 0,
+  0, 0);
