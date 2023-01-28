@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.9.2" last-position="0,0" last-zoom="1" max-obj-count="9"
+	 default-schema="public" default-owner="postgres">
+<role name="photoman"
+      inherit="true"
+      login="true"
+      encrypted="true"
+      password="********">
+</role>
+
+<database name="photodb" encoding="UTF8" lc-collate="ru_RU.UTF-8" lc-ctype="ru_RU.UTF-8" is-template="false" allow-conns="true">
+	<role name="photoman"/>
+	<tablespace name="pg_default"/>
+</database>
+
+<schema name="public" layer="0" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="camera" layer="0" collapse-mode="2" max-obj-count="3">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="620" y="260"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="model" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="brand">
+		<type name="character varying" length="30"/>
+	</column>
+	<constraint name="camera_pkey" type="pk-constr" table="public.camera">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="camera_model_key" type="uq-constr" table="public.camera">
+		<columns names="model" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="city" layer="0" collapse-mode="2" max-obj-count="2">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="620" y="820"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<constraint name="city_pkey" type="pk-constr" table="public.city">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="city_name_key" type="uq-constr" table="public.city">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="country" layer="0" collapse-mode="2" max-obj-count="2">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="620" y="460"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<constraint name="country_pkey" type="pk-constr" table="public.country">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="country_name_key" type="uq-constr" table="public.country">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="image" layer="0" collapse-mode="2" max-obj-count="8">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="80" y="80"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="res_width" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="res_height" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="subfolder_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="file_name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="photo_time">
+		<type name="timestamp" length="0" precision="6"/>
+	</column>
+	<column name="camera_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="image_pkey" type="pk-constr" table="public.image">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="image_file_path_uniq" type="uq-constr" table="public.image">
+		<columns names="subfolder_id,file_name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="image_location" layer="0" collapse-mode="2" max-obj-count="6">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="80" y="400"/>
+	<column name="image_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="location_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="gnss_pos" not-null="true">
+		<type name="character" length="1"/>
+	</column>
+	<column name="latitude" not-null="true">
+		<type name="numeric" length="10" precision="5"/>
+	</column>
+	<column name="longitude" not-null="true">
+		<type name="numeric" length="10" precision="5"/>
+	</column>
+	<constraint name="gnss_pos_check" type="ck-constr" table="public.image_location">
+			<expression><![CDATA[(gnss_pos = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))]]></expression>
+	</constraint>
+	<constraint name="image_location_pkey" type="pk-constr" table="public.image_location">
+		<columns names="image_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="location" layer="0" collapse-mode="2" max-obj-count="8">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="80" y="700"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="place" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="country_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="region_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="city_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="latitude" not-null="true">
+		<type name="numeric" length="10" precision="5"/>
+	</column>
+	<column name="longitude" not-null="true">
+		<type name="numeric" length="10" precision="5"/>
+	</column>
+	<constraint name="location_desc_pkey" type="pk-constr" table="public.location">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="location_place_key" type="uq-constr" table="public.location">
+		<columns names="place" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="region" layer="0" collapse-mode="2" max-obj-count="2">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="620" y="640"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<constraint name="region_pkey" type="pk-constr" table="public.region">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="region_name_key" type="uq-constr" table="public.region">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="subfolder" layer="0" collapse-mode="2" max-obj-count="2">
+	<schema name="public"/>
+	<role name="photoman"/>
+	<position x="620" y="80"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<constraint name="subfolder_pkey" type="pk-constr" table="public.subfolder">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="subfolder_name_key" type="uq-constr" table="public.subfolder">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="image_camera_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.camera" table="public.image">
+	<columns names="camera_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="image_subfolder_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.subfolder" table="public.image">
+	<columns names="subfolder_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="image_location_image_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.image" table="public.image_location">
+	<columns names="image_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="image_location_location_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.location" table="public.image_location">
+	<columns names="location_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="location_city_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.city" table="public.location">
+	<columns names="city_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="location_country_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.country" table="public.location">
+	<columns names="country_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="location_region_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.region" table="public.location">
+	<columns names="region_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_image_camera" type="relfk" layer="0"
+	 custom-color="#112c8f"
+	 src-table="public.image"
+	 dst-table="public.camera" reference-fk="image_camera_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_image_subfolder" type="relfk" layer="0"
+	 custom-color="#472eee"
+	 src-table="public.image"
+	 dst-table="public.subfolder" reference-fk="image_subfolder_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_image_location_image" type="relfk" layer="0"
+	 custom-color="#2b5573"
+	 src-table="public.image_location"
+	 dst-table="public.image" reference-fk="image_location_image_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_image_location_location" type="relfk" layer="0"
+	 custom-color="#52f0ba"
+	 src-table="public.image_location"
+	 dst-table="public.location" reference-fk="image_location_location_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_location_city" type="relfk" layer="0"
+	 custom-color="#1c69bd"
+	 src-table="public.location"
+	 dst-table="public.city" reference-fk="location_city_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_location_country" type="relfk" layer="0"
+	 custom-color="#f69a09"
+	 src-table="public.location"
+	 dst-table="public.country" reference-fk="location_country_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_location_region" type="relfk" layer="0"
+	 custom-color="#be6cf2"
+	 src-table="public.location"
+	 dst-table="public.region" reference-fk="location_region_id_fkey"
+	 src-required="false" dst-required="false"/>
+
+</dbmodel>
