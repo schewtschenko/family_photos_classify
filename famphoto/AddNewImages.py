@@ -77,7 +77,7 @@ def _select_image_id(conn, file_name, subfolder_id):
             has_data = True
     except psycopg2.Error as err:
         print(err.pgerror, file=sys.stderr)
-        success = True
+        success = False
     finally:
         if cursor:
             cursor.close()
